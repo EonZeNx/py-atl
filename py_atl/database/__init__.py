@@ -18,6 +18,13 @@ def setup(db_path: str) -> None:
     DB_CONNECTION.OpenConnection()
 
 
+def setup_jc3() -> None:
+    from os import path
+    from py_atl import utils
+
+    setup(path.join(utils.project_path(), "database", "atl.jc3.db"))
+
+
 def lookup(game_hash: int):
     global DB_CONNECTION
 
