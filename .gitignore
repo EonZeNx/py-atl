@@ -1,0 +1,10 @@
+.idea
+.venv
+__pycache__
+
+test
+
+py_atl/dll/**.dll
+py_atl/dll/**.json
+
+**.db
