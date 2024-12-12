@@ -67,7 +67,7 @@ def to_rigid_object(container: RtpcV01Container) -> RtpcRigidObject | None:
         return None
 
     name_value: str = RtpcV01VariantExtensions.AsString(name_property)
-    world_value = cs_to.bpy_matrix(RtpcV01VariantExtensions.AsMat4X4(world_property))
+    world_value = cs_to.bpy_matrix(RtpcV01VariantExtensions.AsFloatArray(world_property))
     filename: str = option_filename_result.Unwrap().Value
 
     rigid_object: RtpcRigidObject = RtpcRigidObject(name_value)
