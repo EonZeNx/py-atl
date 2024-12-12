@@ -28,43 +28,36 @@ def get_property(container: RtpcV01Container, property_id: str | int) -> RtpcV01
     return None
 
 
-def get_properties(container: RtpcV01Container, property_hashes: list[int]) -> dict[int, RtpcV01Variant]:
-    properties: dict[int, RtpcV01Variant] = {k: None for k in property_hashes}
+def get_properties(container: RtpcV01Container, property_names: list[str]) -> (dict[str, RtpcV01Variant], list[str]):
+    property_hashes: dict[int, str] = {JenkinsL3.Jenkins(name): name for name in property_names}
+
+    properties: dict[str, RtpcV01Variant] = {}
     for container_property in container.Properties:
         if container_property.NameHash not in property_hashes:
             continue
 
-        i: int = property_hashes.index(container_property.NameHash)
-        properties[property_hashes[i]] = container_property
+        name: str = property_hashes[container_property.NameHash]
+        properties[name] = container_property
 
-    return properties
+    not_found: list[str] = [name for name in property_names if name not in properties]
+    return properties, not_found
 
 
 def to_rigid_object(container: RtpcV01Container) -> RtpcRigidObject | None:
-    name_hash: int = JenkinsL3.Jenkins("name")
-    world_hash: int = JenkinsL3.Jenkins("world")
-    filename_hash: int = JenkinsL3.Jenkins("filename")
-
-    properties: dict[int, RtpcRigidObject] = get_properties(container, [
-        name_hash,
-        world_hash,
-        filename_hash,
+    properties, not_found = get_properties(container, [
+        "name",
+        "world",
+        "filename",
     ])
 
-    name_property = properties.get(name_hash)
-    if name_property is None:
-        development.log(f"container did not have name property")
+    if len(not_found) > 0:
+        development.log(f"container did not have {len(not_found)} property/ies")
+        print(not_found)
         return None
 
-    world_property = properties.get(world_hash)
-    if world_property is None:
-        development.log(f"container did not have world property")
-        return None
-
-    filename_hash_property = properties.get(filename_hash)
-    if filename_hash_property is None:
-        development.log(f"container did not have filename property")
-        return None
+    name_property = properties.get("name")
+    world_property = properties.get("world")
+    filename_hash_property = properties.get("filename")
 
     filename_hash_value: int = RtpcV01VariantHeaderExtensions.AsInt(filename_hash_property)
 
