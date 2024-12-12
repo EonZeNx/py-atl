@@ -20,9 +20,9 @@ def setup(db_path: str) -> None:
 
 def setup_jc3() -> None:
     from os import path
-    from py_atl import utils
+    from py_atl import addon
 
-    setup(path.join(utils.project_path(), "database", "atl.jc3.db"))
+    setup(path.join(addon.project_path(), "database", "atl.jc3.db"))
 
 
 def lookup(game_hash: int):

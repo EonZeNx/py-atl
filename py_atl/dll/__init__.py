@@ -5,7 +5,7 @@ if pythonnet.get_runtime_info() is not None:
 pythonnet.load("coreclr")
 import clr
 
-from py_atl import development, utils
+from py_atl import development, addon
 from os import path, listdir
 
 
@@ -38,4 +38,4 @@ def setup_dll(project_path: str, log_result: bool = False):
             development.log(f"\t- {dll}")
 
 
-setup_dll(utils.project_path())
+setup_dll(addon.project_path())

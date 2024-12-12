@@ -7,10 +7,12 @@ bl_info = {
     "version": (0, 1, 0),
 }
 
-from py_atl import utils, dll
 import bpy
 from bpy.props import StringProperty
 from bpy.types import AddonPreferences
+from os import path
+
+from py_atl import addon, dll
 
 
 class PyAtlPreferences(AddonPreferences):
@@ -19,7 +21,7 @@ class PyAtlPreferences(AddonPreferences):
     project_path: StringProperty(
         name="Project Base Path",
         description="Base path for dll files, database files, and more",
-        default="",
+        default=path.dirname(__file__),
         subtype='DIR_PATH',
         update=lambda self, context: self.on_preference_update(context)
     )
@@ -35,8 +37,7 @@ class PyAtlPreferences(AddonPreferences):
 def register():
     bpy.utils.register_class(PyAtlPreferences)
 
-    from py_atl import utils, dll
-    dll.setup_dll(utils.project_path(), True)
+    dll.setup_dll(addon.project_path(), True)
 
 
 def unregister():
