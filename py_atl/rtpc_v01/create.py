@@ -123,37 +123,23 @@ def to_static_decal(container: RtpcV01Container) -> RtpcStaticDecalObject | None
     tile_v_property = properties.get("tile_v")
     world_property = properties.get("world")
 
-    # Resolve diffuse_texture filepath
-    diffuse_texture_hash_value: int = RtpcV01VariantHeaderExtensions.AsInt(diffuse_texture_property)
-    option_diffuse_texture_result = database.lookup_filepath(diffuse_texture_hash_value)
-    if option_diffuse_texture_result.IsNone:
-        development.log(f"failed to find diffuse_texture '{diffuse_texture_hash_value}'")
-        return None
-
-    # Resolve alphamask_texture filepath
-    alphamask_texture_hash_value: int = RtpcV01VariantHeaderExtensions.AsInt(alphamask_texture_property)
-    option_alphamask_texture_result = database.lookup_filepath(alphamask_texture_hash_value)
-    if option_alphamask_texture_result.IsNone:
-        development.log(f"failed to find alphamask_texture '{alphamask_texture_hash_value}'")
-        return None
-
     name_value: str = RtpcV01VariantExtensions.AsString(name_property)
-    emissive_value: float = RtpcV01VariantExtensions.AsFloat(emissive_property)
-    alpha_max_value: float = RtpcV01VariantExtensions.AsFloat(alpha_max_property)
-    alpha_min_value: float = RtpcV01VariantExtensions.AsFloat(alpha_min_property)
-    alphamask_offset_u_value: float = RtpcV01VariantExtensions.AsFloat(alphamask_offset_u_property)
-    alphamask_offset_v_value: float = RtpcV01VariantExtensions.AsFloat(alphamask_offset_v_property)
-    alphamask_source_channel_value: float = RtpcV01VariantExtensions.AsFloat(alphamask_source_channel_property)
-    alphamask_texture_value: str = option_alphamask_texture_result.Unwrap().Value
-    alphamask_tile_u_value: float = RtpcV01VariantExtensions.AsFloat(alphamask_tile_u_property)
-    alphamask_tile_v_value: float = RtpcV01VariantExtensions.AsFloat(alphamask_tile_v_property)
-    color_value: mathutils.Euler = cs_to.bpy_euler(color_property)
-    diffuse_texture_value: str = option_diffuse_texture_result.Unwrap().Value
-    is_distance_field_stencil_value: bool = RtpcV01VariantExtensions.AsInt(is_distance_field_stencil_property) == 1
-    offset_u_value: float = RtpcV01VariantExtensions.AsFloat(offset_u_property)
-    offset_v_value: float = RtpcV01VariantExtensions.AsFloat(offset_v_property)
-    tile_u_value: float = RtpcV01VariantExtensions.AsFloat(tile_u_property)
-    tile_v_value: float = RtpcV01VariantExtensions.AsFloat(tile_v_property)
+    emissive_value: float = RtpcV01VariantHeaderExtensions.AsFloat(emissive_property)
+    alpha_max_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alpha_max_property)
+    alpha_min_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alpha_min_property)
+    alphamask_offset_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_offset_u_property)
+    alphamask_offset_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_offset_v_property)
+    alphamask_source_channel_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_source_channel_property)
+    alphamask_texture_value: str = RtpcV01VariantExtensions.AsString(alphamask_texture_property)
+    alphamask_tile_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_tile_u_property)
+    alphamask_tile_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_tile_v_property)
+    color_value: mathutils.Euler = cs_to.bpy_euler(RtpcV01VariantExtensions.AsFloatArray(color_property))
+    diffuse_texture_value: str = RtpcV01VariantExtensions.AsString(diffuse_texture_property)
+    is_distance_field_stencil_value: bool = RtpcV01VariantHeaderExtensions.AsInt(is_distance_field_stencil_property) == 1
+    offset_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(offset_u_property)
+    offset_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(offset_v_property)
+    tile_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(tile_u_property)
+    tile_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(tile_v_property)
     world_value = cs_to.bpy_matrix(RtpcV01VariantExtensions.AsFloatArray(world_property))
 
     decal: RtpcStaticDecalObject = RtpcStaticDecalObject(name_value)
