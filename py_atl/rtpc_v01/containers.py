@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Self
 import mathutils
 
+
 @dataclass(slots=True)
 class RtpcObject:
     init_value: str | int | None = field(init=True, default=None)
