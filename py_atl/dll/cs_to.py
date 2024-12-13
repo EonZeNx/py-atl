@@ -4,7 +4,7 @@ functions to convert objects from c# to python
 
 from System import Array, Single
 
-from mathutils import Matrix
+from mathutils import Euler, Matrix
 
 
 def bpy_matrix(mat4: Array[Single]) -> Matrix:
@@ -19,3 +19,12 @@ def bpy_matrix(mat4: Array[Single]) -> Matrix:
     ))
 
     return matrix
+
+
+def bpy_euler(vec3: Array[Single]) -> Euler:
+    if len(vec3) != 3:
+        raise ValueError(f"Expected 3 elements, got {len(vec3)}")
+
+    euler: Euler = Euler((vec3[0],  vec3[1],  vec3[2]))
+
+    return euler

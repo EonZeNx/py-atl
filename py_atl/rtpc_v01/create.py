@@ -1,10 +1,11 @@
 """
 
 """
+import mathutils
 
 from py_atl import database, development
 from py_atl.dll import cs_to
-from py_atl.rtpc_v01.containers import RtpcWorldObject, RtpcRigidObject
+from py_atl.rtpc_v01.containers import RtpcWorldObject, RtpcRigidObject, RtpcStaticDecalObject
 
 # these may produce expected warnings
 from ApexFormat.RTPC.V01.Class import (RtpcV01Container, RtpcV01Variant, RtpcV01VariantExtensions,
@@ -60,7 +61,6 @@ def to_rigid_object(container: RtpcV01Container) -> RtpcRigidObject | None:
     filename_hash_property = properties.get("filename")
 
     filename_hash_value: int = RtpcV01VariantHeaderExtensions.AsInt(filename_hash_property)
-
     option_filename_result = database.lookup_filepath(filename_hash_value)
     if option_filename_result.IsNone:
         development.log(f"failed to find filename '{filename_hash_value}'")
@@ -77,6 +77,93 @@ def to_rigid_object(container: RtpcV01Container) -> RtpcRigidObject | None:
     return rigid_object
 
 
+def to_static_decal(container: RtpcV01Container) -> RtpcStaticDecalObject | None:
+    properties, not_found = get_properties(container, [
+        "name",
+        "Emissive",
+        "alpha_max",
+        "alpha_min",
+        "alphamask_offset_u",
+        "alphamask_offset_v",
+        "alphamask_source_channel",
+        "alphamask_texture",
+        "alphamask_tile_u",
+        "alphamask_tile_v",
+        "color",
+        "diffuse_texture",
+        "is_distance_field_stencil",
+        "offset_u",
+        "offset_v",
+        "tile_u",
+        "tile_v",
+        "world",
+    ])
+
+    if len(not_found) > 0:
+        development.log(f"container did not have {len(not_found)} property/ies")
+        print(not_found)
+        return None
+
+    name_property = properties.get("name")
+    emissive_property = properties.get("Emissive")
+    alpha_max_property = properties.get("alpha_max")
+    alpha_min_property = properties.get("alpha_min")
+    alphamask_offset_u_property = properties.get("alphamask_offset_u")
+    alphamask_offset_v_property = properties.get("alphamask_offset_v")
+    alphamask_source_channel_property = properties.get("alphamask_source_channel")
+    alphamask_texture_property = properties.get("alphamask_texture")
+    alphamask_tile_u_property = properties.get("alphamask_tile_u")
+    alphamask_tile_v_property = properties.get("alphamask_tile_v")
+    color_property = properties.get("color")
+    diffuse_texture_property = properties.get("diffuse_texture")
+    is_distance_field_stencil_property = properties.get("is_distance_field_stencil")
+    offset_u_property = properties.get("offset_u")
+    offset_v_property = properties.get("offset_v")
+    tile_u_property = properties.get("tile_u")
+    tile_v_property = properties.get("tile_v")
+    world_property = properties.get("world")
+
+    name_value: str = RtpcV01VariantExtensions.AsString(name_property)
+    emissive_value: float = RtpcV01VariantHeaderExtensions.AsFloat(emissive_property)
+    alpha_max_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alpha_max_property)
+    alpha_min_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alpha_min_property)
+    alphamask_offset_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_offset_u_property)
+    alphamask_offset_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_offset_v_property)
+    alphamask_source_channel_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_source_channel_property)
+    alphamask_texture_value: str = RtpcV01VariantExtensions.AsString(alphamask_texture_property)
+    alphamask_tile_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_tile_u_property)
+    alphamask_tile_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_tile_v_property)
+    color_value: mathutils.Euler = cs_to.bpy_euler(RtpcV01VariantExtensions.AsFloatArray(color_property))
+    diffuse_texture_value: str = RtpcV01VariantExtensions.AsString(diffuse_texture_property)
+    is_distance_field_stencil_value: bool = RtpcV01VariantHeaderExtensions.AsInt(is_distance_field_stencil_property) == 1
+    offset_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(offset_u_property)
+    offset_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(offset_v_property)
+    tile_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(tile_u_property)
+    tile_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(tile_v_property)
+    world_value = cs_to.bpy_matrix(RtpcV01VariantExtensions.AsFloatArray(world_property))
+
+    decal: RtpcStaticDecalObject = RtpcStaticDecalObject(name_value)
+    decal.Emissive = emissive_value
+    decal.alpha_max = alpha_max_value
+    decal.alpha_min = alpha_min_value
+    decal.alphamask_offset_u = alphamask_offset_u_value
+    decal.alphamask_offset_v = alphamask_offset_v_value
+    decal.alphamask_source_channel = alphamask_source_channel_value
+    decal.alphamask_texture = alphamask_texture_value
+    decal.alphamask_tile_u = alphamask_tile_u_value
+    decal.alphamask_tile_v = alphamask_tile_v_value
+    decal.color = color_value
+    decal.diffuse_texture = diffuse_texture_value
+    decal.is_distance_field_stencil = is_distance_field_stencil_value
+    decal.offset_u = offset_u_value
+    decal.offset_v = offset_v_value
+    decal.tile_u = tile_u_value
+    decal.tile_v = tile_v_value
+    decal.world = world_value
+
+    return decal
+
+
 def from_rtpc(container: RtpcV01Container, recurse: bool = True) -> RtpcWorldObject | None:
     class_property = get_property(container, "_class")
     if class_property is None:
@@ -87,6 +174,8 @@ def from_rtpc(container: RtpcV01Container, recurse: bool = True) -> RtpcWorldObj
     rtpc_object: RtpcWorldObject | None = None
     if class_value == "CRigidObject":
         rtpc_object = to_rigid_object(container)
+    elif class_value == "CStaticDecalObject":
+        rtpc_object = to_static_decal(container)
 
     if recurse:
         for child_container in container.Containers:
