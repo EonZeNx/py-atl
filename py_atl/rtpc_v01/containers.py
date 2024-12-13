@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Self
-
+import mathutils
 
 @dataclass(slots=True)
 class RtpcObject:
@@ -53,3 +53,21 @@ class RtpcRigidObject(RtpcWorldObject):
 
         return f"{type(self).__name__}({name_or_hash}, filename: {filename_or_hash}, world: {self.world}{containers_prefix}{containers_str})"
 
+@dataclass(slots=True)
+class RtpcStaticDecalObject(RtpcWorldObject):
+    Emissive: float | None = field(init=False, default=None)
+    alpha_max: float | None = field(init=False, default=None)
+    alpha_min: float | None = field(init=False, default=None)
+    alphamask_offset_u: float | None = field(init=False, default=None)
+    alphamask_offset_v: float | None = field(init=False, default=None)
+    alphamask_source_channel: int | None = field(init=False, default=None)
+    alphamask_texture: str | None = field(init=False, default=None)
+    alphamask_tile_u: float | None = field(init=False, default=None)
+    alphamask_tile_v: float | None = field(init=False, default=None)
+    color: mathutils.Euler | None = field(init=False, default=None)
+    diffuse_texture: str | None = field(init=False, default=None)
+    is_distance_field_stencil: int | None = field(init=False, default=None)
+    offset_u: float | None = field(init=False, default=None)
+    offset_v: float | None = field(init=False, default=None)
+    tile_u: float | None = field(init=False, default=None)
+    tile_v: float | None = field(init=False, default=None)
