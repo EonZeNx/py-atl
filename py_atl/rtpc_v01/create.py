@@ -76,7 +76,7 @@ def to_rigid_object(container: RtpcV01Container) -> RtpcRigidObject | None:
 
     return rigid_object
 
-def to_decal(container: RtpcV01Container) -> RtpcRigidObject | None:
+def to_decal(container: RtpcV01Container) -> RtpcStaticDecalObject | None:
     properties, not_found = get_properties(container, [
         "name",
         "Emissive",
