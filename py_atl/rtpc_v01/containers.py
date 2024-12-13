@@ -53,6 +53,7 @@ class RtpcRigidObject(RtpcWorldObject):
 
         return f"{type(self).__name__}({name_or_hash}, filename: {filename_or_hash}, world: {self.world}{containers_prefix}{containers_str})"
 
+
 @dataclass(slots=True)
 class RtpcStaticDecalObject(RtpcWorldObject):
     Emissive: float | None = field(init=False, default=None)
