@@ -73,3 +73,17 @@ class RtpcStaticDecalObject(RtpcWorldObject):
     offset_v: float | None = field(init=False, default=None)
     tile_u: float | None = field(init=False, default=None)
     tile_v: float | None = field(init=False, default=None)
+
+@dataclass(slots=True)
+class RtpcDynamicLightObject(RtpcWorldObject):
+    diffuse: mathutils.Euler | None = field(init=False, default=None)
+    is_spot_light: int | None = field(init=False, default=None)
+    multiplier: float | None = field(init=False, default=None)
+    on_during_daytime: int | None = field(init=False, default=None)
+    projected_texture: int | None = field(init=False, default=None)
+    projected_texture_enabled: int | None = field(init=False, default=None)
+    projected_texture_u_scale: float | None = field(init=False, default=None)
+    projected_texture_v_scale: float | None = field(init=False, default=None)
+    radius: float | None = field(init=False, default=None)
+    spot_angle: float | None = field(init=False, default=None)
+    spot_inner_angle: float | None = field(init=False, default=None)

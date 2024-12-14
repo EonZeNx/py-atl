@@ -5,7 +5,7 @@ import mathutils
 
 from py_atl import database, development
 from py_atl.dll import cs_to
-from py_atl.rtpc_v01.containers import RtpcWorldObject, RtpcRigidObject, RtpcStaticDecalObject
+from py_atl.rtpc_v01.containers import RtpcWorldObject, RtpcRigidObject, RtpcStaticDecalObject, RtpcDynamicLightObject
 
 # these may produce expected warnings
 from ApexFormat.RTPC.V01.Class import (RtpcV01Container, RtpcV01Variant, RtpcV01VariantExtensions,
@@ -129,7 +129,7 @@ def to_static_decal(container: RtpcV01Container) -> RtpcStaticDecalObject | None
     alpha_min_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alpha_min_property)
     alphamask_offset_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_offset_u_property)
     alphamask_offset_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_offset_v_property)
-    alphamask_source_channel_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_source_channel_property)
+    alphamask_source_channel_value: int = RtpcV01VariantHeaderExtensions.AsInt(alphamask_source_channel_property)
     alphamask_texture_value: str = RtpcV01VariantExtensions.AsString(alphamask_texture_property)
     alphamask_tile_u_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_tile_u_property)
     alphamask_tile_v_value: float = RtpcV01VariantHeaderExtensions.AsFloat(alphamask_tile_v_property)
@@ -163,6 +163,71 @@ def to_static_decal(container: RtpcV01Container) -> RtpcStaticDecalObject | None
 
     return decal
 
+def to_dynamic_light(container: RtpcV01Container) -> RtpcDynamicLightObject | None:
+    properties, not_found = get_properties(container, [
+        "name",
+        "diffuse",
+        "is_spot_light",
+        "multiplier",
+        "on_during_daytime",
+        "projected_texture",
+        "projected_texture_enabled",
+        "projected_texture_u_scale",
+        "projected_texture_v_scale",
+        "radius",
+        "spot_angle",
+        "spot_inner_angle",
+        "world",
+    ])
+
+    if len(not_found) > 0:
+        development.log(f"container did not have {len(not_found)} property/ies")
+        print(not_found)
+        return None
+
+    name_property = properties.get("name")
+    diffuse_property = properties.get("diffuse")
+    is_spot_light_property = properties.get("is_spot_light")
+    multiplier_property = properties.get("multiplier")
+    on_during_daytime_property = properties.get("on_during_daytime")
+    projected_texture_property = properties.get("projected_texture")
+    projected_texture_enabled_property = properties.get("projected_texture_enabled")
+    projected_texture_u_scale_property = properties.get("projected_texture_u_scale")
+    projected_texture_v_scale_property = properties.get("projected_texture_v_scale")
+    radius_property = properties.get("radius")
+    spot_angle_property = properties.get("spot_angle")
+    spot_inner_angle_property = properties.get("spot_inner_angle")
+    world_property = properties.get("world")
+
+    name_value: str = RtpcV01VariantExtensions.AsString(name_property)
+    diffuse_value: mathutils.Euler = cs_to.bpy_euler(RtpcV01VariantExtensions.AsFloatArray(diffuse_property))
+    is_spot_light_value: int = RtpcV01VariantHeaderExtensions.AsInt(is_spot_light_property)
+    multiplier_value: float = RtpcV01VariantHeaderExtensions.AsFloat(multiplier_property)
+    on_during_daytime_value: int = RtpcV01VariantHeaderExtensions.AsInt(on_during_daytime_property)
+    projected_texture_value: int = RtpcV01VariantHeaderExtensions.AsInt(projected_texture_property)
+    projected_texture_enabled_value: int = RtpcV01VariantHeaderExtensions.AsInt(projected_texture_enabled_property)
+    projected_texture_u_scale_value: float = RtpcV01VariantHeaderExtensions.AsFloat(projected_texture_u_scale_property)
+    projected_texture_v_scale_value: float = RtpcV01VariantHeaderExtensions.AsFloat(projected_texture_v_scale_property)
+    radius_value: float = RtpcV01VariantHeaderExtensions.AsFloat(radius_property)
+    spot_angle_value: float = RtpcV01VariantHeaderExtensions.AsFloat(spot_angle_property)
+    spot_inner_angle_value: float = RtpcV01VariantHeaderExtensions.AsFloat(spot_inner_angle_property)
+    world_value = cs_to.bpy_matrix(RtpcV01VariantExtensions.AsFloatArray(world_property))
+
+    light: RtpcDynamicLightObject = RtpcDynamicLightObject(name_value)
+    light.diffuse = diffuse_value
+    light.is_spot_light = is_spot_light_value
+    light.multiplier = multiplier_value
+    light.on_during_daytime = on_during_daytime_value
+    light.projected_texture = projected_texture_value
+    light.projected_texture_enabled = projected_texture_enabled_value
+    light.projected_texture_u_scale = projected_texture_u_scale_value
+    light.projected_texture_v_scale = projected_texture_v_scale_value
+    light.radius = radius_value
+    light.spot_angle = spot_angle_value
+    light.spot_inner_angle = spot_inner_angle_value
+    light.world = world_value
+
+    return light
 
 def from_rtpc(container: RtpcV01Container, recurse: bool = True) -> RtpcWorldObject | None:
     class_property = get_property(container, "_class")
@@ -176,6 +241,8 @@ def from_rtpc(container: RtpcV01Container, recurse: bool = True) -> RtpcWorldObj
         rtpc_object = to_rigid_object(container)
     elif class_value == "CStaticDecalObject":
         rtpc_object = to_static_decal(container)
+    elif class_value == "CDynamicLightObject":
+        rtpc_object = to_dynamic_light(container)
 
     if recurse:
         for child_container in container.Containers:
